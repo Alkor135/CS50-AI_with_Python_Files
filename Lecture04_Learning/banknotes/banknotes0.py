@@ -9,9 +9,9 @@ from sklearn.neighbors import KNeighborsClassifier
 # model = Perceptron()
 # model = svm.SVC()
 # model = KNeighborsClassifier(n_neighbors=1)
-model = GaussianNB()
+# model = GaussianNB()
 
-# Read data in from file
+# Чтение данных из файла
 with open("banknotes.csv") as f:
     reader = csv.reader(f)
     next(reader)
@@ -20,38 +20,54 @@ with open("banknotes.csv") as f:
     for row in reader:
         data.append({
             "evidence": [float(cell) for cell in row[:4]],
-            "label": "Authentic" if row[4] == "0" else "Counterfeit"
+            "label": "Подлинный" if row[4] == "0" else "Поддельный"
         })
 
-# Separate data into training and testing groups
+# Разделите данные на группы обучения и тестирования
 holdout = int(0.40 * len(data))
 random.shuffle(data)
 testing = data[:holdout]
 training = data[holdout:]
 
-# Train model on training set
-X_training = [row["evidence"] for row in training]
-y_training = [row["label"] for row in training]
-model.fit(X_training, y_training)
 
-# Make predictions on the testing set
-X_testing = [row["evidence"] for row in testing]
-y_testing = [row["label"] for row in testing]
-predictions = model.predict(X_testing)
+def fit_model(model):
+    # Обучающая модель на тренировочном наборе
+    X_training = [row["evidence"] for row in training]
+    y_training = [row["label"] for row in training]
+    model.fit(X_training, y_training)
 
-# Compute how well we performed
-correct = 0
-incorrect = 0
-total = 0
-for actual, predicted in zip(y_testing, predictions):
-    total += 1
-    if actual == predicted:
-        correct += 1
-    else:
-        incorrect += 1
+    # Делайте прогнозы на тестовом наборе
+    X_testing = [row["evidence"] for row in testing]
+    y_testing = [row["label"] for row in testing]
+    predictions = model.predict(X_testing)
 
-# Print results
-print(f"Results for model {type(model).__name__}")
-print(f"Correct: {correct}")
-print(f"Incorrect: {incorrect}")
-print(f"Accuracy: {100 * correct / total:.2f}%")
+    # Подсчитайте, насколько хорошо мы справились
+    correct = 0
+    incorrect = 0
+    total = 0
+    for actual, predicted in zip(y_testing, predictions):
+        total += 1
+        if actual == predicted:
+            correct += 1
+        else:
+            incorrect += 1
+
+    # Вывод результатов
+    print(f"\nРезультаты для модели {type(model).__name__}")
+    print(f"Корректных: {correct}")
+    print(f"Некорректных: {incorrect}")
+    print(f"Точность: {100 * correct / total:.2f}%")
+
+
+if __name__ == "__main__":
+    model = Perceptron()
+    fit_model(model)
+
+    model = svm.SVC()
+    fit_model(model)
+
+    model = KNeighborsClassifier(n_neighbors=1)
+    fit_model(model)
+
+    model = GaussianNB()
+    fit_model(model)
