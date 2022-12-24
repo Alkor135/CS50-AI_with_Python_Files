@@ -1,28 +1,42 @@
 import sys
 
-class Node():
+
+class Node:
+    """
+    Класс отслеживает состояние, родитель и действие
+    Можно будет рассчитать стоимость пути.
+    """
     def __init__(self, state, parent, action):
-        self.state = state
-        self.parent = parent
-        self.action = action
+        self.state = state  # Состояние
+        self.parent = parent  # Родитель (предыдущее состояние)
+        self.action = action  # Действие
 
 
-class StackFrontier():
+class StackFrontier:
+    """
+    Реализует идею фронтира по принципу работы стека.
+    Или метода LIFO
+    """
     def __init__(self):
+        """ Создает фронтир в виде пустого списка """
         self.frontier = []
 
     def add(self, node):
+        """ Добавление во фронтир в конец списка"""
         self.frontier.append(node)
 
     def contains_state(self, state):
+        """ Функция проверяет содержит ли фронтир определенное состояние """
         return any(node.state == state for node in self.frontier)
 
     def empty(self):
+        """ Проверяет пуст ли фронтир """
         return len(self.frontier) == 0
 
     def remove(self):
+        """ Удаляет последний элемент с фронтира """
         if self.empty():
-            raise Exception("empty frontier")
+            raise Exception('пустой фронтир')
         else:
             node = self.frontier[-1]
             self.frontier = self.frontier[:-1]
@@ -32,33 +46,34 @@ class StackFrontier():
 class QueueFrontier(StackFrontier):
 
     def remove(self):
+        """ Удаляет первый элемент с фронтира """
         if self.empty():
-            raise Exception("empty frontier")
+            raise Exception('пустой фронтир')
         else:
             node = self.frontier[0]
             self.frontier = self.frontier[1:]
             return node
 
-class Maze():
+
+class Maze:
 
     def __init__(self, filename):
-
-        # Read file and set height and width of maze
+        # Прочитайте файл и установите высоту и ширину лабиринта
         with open(filename) as f:
             contents = f.read()
 
-        # Validate start and goal
+        # Валидация начала и цели
         if contents.count("A") != 1:
-            raise Exception("maze must have exactly one start point")
+            raise Exception("лабиринт должен иметь ровно одну начальную точку")
         if contents.count("B") != 1:
-            raise Exception("maze must have exactly one goal")
+            raise Exception("лабиринт должен иметь ровно одну цель")
 
-        # Determine height and width of maze
+        # Определите высоту и ширину лабиринта
         contents = contents.splitlines()
         self.height = len(contents)
         self.width = max(len(line) for line in contents)
 
-        # Keep track of walls
+        # Следите за стенами
         self.walls = []
         for i in range(self.height):
             row = []
@@ -80,7 +95,6 @@ class Maze():
 
         self.solution = None
 
-
     def print(self):
         solution = self.solution[1] if self.solution is not None else None
         print()
@@ -99,7 +113,6 @@ class Maze():
             print()
         print()
 
-
     def neighbors(self, state):
         row, col = state
         candidates = [
@@ -114,7 +127,6 @@ class Maze():
             if 0 <= r < self.height and 0 <= c < self.width and not self.walls[r][c]:
                 result.append((action, (r, c)))
         return result
-
 
     def solve(self):
         """Finds a solution to maze, if one exists."""
@@ -162,7 +174,6 @@ class Maze():
                 if not frontier.contains_state(state) and state not in self.explored:
                     child = Node(state=state, parent=node, action=action)
                     frontier.add(child)
-
 
     def output_image(self, filename, show_solution=True, show_explored=False):
         from PIL import Image, ImageDraw
@@ -215,15 +226,19 @@ class Maze():
         img.save(filename)
 
 
-if len(sys.argv) != 2:
-    sys.exit("Usage: python maze.py maze.txt")
+# if len(sys.argv) != 2:
+#     sys.exit("Usage: python maze.py maze.txt")
+#
+# m = Maze(sys.argv[1])
 
-m = Maze(sys.argv[1])
-print("Maze:")
+# m = Maze('maze1.txt')
+m = Maze('maze2.txt')
+# m = Maze('maze3.txt')
+print("Лабиринт:")
 m.print()
-print("Solving...")
+print("Решение...")
 m.solve()
-print("States Explored:", m.num_explored)
-print("Solution:")
+print("Исследовано полей:", m.num_explored)
+print("Решение:")
 m.print()
 m.output_image("maze.png", show_explored=True)
