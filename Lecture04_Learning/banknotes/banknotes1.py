@@ -1,3 +1,5 @@
+# Классификация банкнот на валидные и поддельные
+
 import csv
 import random
 
@@ -7,44 +9,56 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 
-model = Perceptron()
-# model = svm.SVC()
-# model = KNeighborsClassifier(n_neighbors=1)
-# model = GaussianNB()
 
-# Read data in from file
-with open("banknotes.csv") as f:
-    reader = csv.reader(f)
-    next(reader)
+def model_predict(model, X_training, y_training, X_testing, y_testing):
+    # Fit model
+    model.fit(X_training, y_training)
 
-    data = []
-    for row in reader:
-        data.append({
-            "evidence": [float(cell) for cell in row[:4]],
-            "label": "Authentic" if row[4] == "0" else "Counterfeit"
-        })
+    # Make predictions on the testing set
+    predictions = model.predict(X_testing)
 
-# Separate data into training and testing groups
-evidence = [row["evidence"] for row in data]
-labels = [row["label"] for row in data]
+    # Compute how well we performed
+    correct = (y_testing == predictions).sum()
+    incorrect = (y_testing != predictions).sum()
+    total = len(predictions)
 
-X_training, X_testing, y_training, y_testing = train_test_split(
-    evidence, labels, test_size=0.4
-)
+    # Print results
+    print(f"Results for model {type(model).__name__}")
+    print(f"Correct: {correct}")
+    print(f"Incorrect: {incorrect}")
+    print(f"Accuracy: {100 * correct / total:.2f}%\n")
 
-# Fit model
-model.fit(X_training, y_training)
 
-# Make predictions on the testing set
-predictions = model.predict(X_testing)
+if __name__ == "__main__":
+    # Чтение данных из файла
+    with open("banknotes.csv") as f:
+        reader = csv.reader(f)
+        next(reader)
 
-# Compute how well we performed
-correct = (y_testing == predictions).sum()
-incorrect = (y_testing != predictions).sum()
-total = len(predictions)
+        data = []
+        for row in reader:
+            data.append({
+                "evidence": [float(cell) for cell in row[:4]],
+                "label": "Authentic" if row[4] == "0" else "Counterfeit"
+            })
 
-# Print results
-print(f"Results for model {type(model).__name__}")
-print(f"Correct: {correct}")
-print(f"Incorrect: {incorrect}")
-print(f"Accuracy: {100 * correct / total:.2f}%")
+    # Separate data into training and testing groups
+    evidence = [row["evidence"] for row in data]
+    labels = [row["label"] for row in data]
+
+    X_training, X_testing, y_training, y_testing = train_test_split(
+        evidence, labels, test_size=0.4
+    )
+
+    model = Perceptron()
+    model_predict(model, X_training, y_training, X_testing, y_testing)
+
+    model = svm.SVC()
+    model_predict(model, X_training, y_training, X_testing, y_testing)
+
+    model = KNeighborsClassifier(n_neighbors=1)
+    model_predict(model, X_training, y_training, X_testing, y_testing)
+
+    model = GaussianNB()
+    model_predict(model, X_training, y_training, X_testing, y_testing)
+

@@ -1,3 +1,5 @@
+# Искуственный интелект прохождение лабиринта
+
 import sys
 
 
@@ -56,7 +58,7 @@ class QueueFrontier(StackFrontier):
 
 
 class Maze:
-
+    """ Лабиринт """
     def __init__(self, filename):
         # Прочитайте файл и установите высоту и ширину лабиринта
         with open(filename) as f:

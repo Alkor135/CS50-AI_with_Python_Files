@@ -1,3 +1,5 @@
+# Классификация банкнот на валидные и поддельные
+
 import csv
 import random
 
@@ -5,29 +7,6 @@ from sklearn import svm
 from sklearn.linear_model import Perceptron
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-
-# model = Perceptron()
-# model = svm.SVC()
-# model = KNeighborsClassifier(n_neighbors=1)
-# model = GaussianNB()
-
-# Чтение данных из файла
-with open("banknotes.csv") as f:
-    reader = csv.reader(f)
-    next(reader)
-
-    data = []
-    for row in reader:
-        data.append({
-            "evidence": [float(cell) for cell in row[:4]],
-            "label": "Подлинный" if row[4] == "0" else "Поддельный"
-        })
-
-# Разделите данные на группы обучения и тестирования
-holdout = int(0.40 * len(data))
-random.shuffle(data)
-testing = data[:holdout]
-training = data[holdout:]
 
 
 def fit_model(model):
@@ -60,6 +39,24 @@ def fit_model(model):
 
 
 if __name__ == "__main__":
+    # Чтение данных из файла
+    with open("banknotes.csv") as f:
+        reader = csv.reader(f)
+        next(reader)
+
+        data = []
+        for row in reader:
+            data.append({
+                "evidence": [float(cell) for cell in row[:4]],
+                "label": "Подлинный" if row[4] == "0" else "Поддельный"
+            })
+
+    # Разделите данные на группы обучения и тестирования
+    holdout = int(0.40 * len(data))
+    random.shuffle(data)
+    testing = data[:holdout]
+    training = data[holdout:]
+
     model = Perceptron()
     fit_model(model)
 
