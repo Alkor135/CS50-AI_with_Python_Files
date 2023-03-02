@@ -1,4 +1,5 @@
-# CS50-AI_with_Python_Files  
+# CS50-AI_with_Python_Files    
+Python 3.9
 
 Files for CS50: Introduction to AI with Python series  
 Файлы программ, упомянутых в серии CS50 Введение в искусственный интеллект с помощью Python. 
